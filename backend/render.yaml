@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: aloe-raw-api
+    runtime: go
+    buildCommand: go build -o server .
+    startCommand: ./server
+    envVars:
+      - key: GIN_MODE
+        value: release
+      - key: PORT
+        value: 8080
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        value: https://aloe-raw-api.onrender.com/auth/google/callback
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: CLIENT_URL
+        value: https://startupinspirator.github.io
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: ./aloe_raw.db
