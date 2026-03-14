@@ -10,8 +10,12 @@ export default function Product() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { loginWithGoogle } = useAuth();
   const [product, setProduct] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+  const [reviewError, setReviewError] = useState("");
+  const { user, loginWithGoogle } = useAuth();
+  
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
   const [added, setAdded] = useState(false);
@@ -24,7 +28,26 @@ export default function Product() {
     axios.get(`${API_URL}/api/products/${id}`)
       .then(res => setProduct(res.data))
       .catch(() => setError("Product not found"));
+      
+    fetchReviews();
   }, [id]);
+
+  const fetchReviews = () => {
+    axios.get(`${API_URL}/api/products/${id}/reviews`)
+      .then(res => setReviews(res.data.reviews || []))
+      .catch(err => console.error("Could not fetch reviews", err));
+  };
+
+  const submitReview = async () => {
+    try {
+      setReviewError("");
+      await axios.post(`${API_URL}/api/products/${id}/reviews`, newReview, { withCredentials: true });
+      setNewReview({ rating: 5, comment: "" });
+      fetchReviews(); // Refresh
+    } catch (err) {
+      setReviewError(err.response?.data?.error || "Failed to submit review");
+    }
+  };
 
   const handleAddToCart = async () => {
     setAdding(true);
@@ -102,6 +125,63 @@ export default function Product() {
             🛡️ &nbsp;100% freshness guaranteed. Full refund if not satisfied.
           </div>
         </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="reviews-section">
+        <h2>Customer Reviews</h2>
+        <div className="reviews-grid">
+          {reviews.length === 0 ? (
+            <p className="no-reviews">No reviews yet. Be the first to review!</p>
+          ) : (
+            reviews.map(r => (
+              <div key={r.id} className="review-card">
+                <div className="review-header">
+                  {r.user_avatar ? (
+                    <img src={r.user_avatar} alt="User" />
+                  ) : (
+                    <div className="avatar-fallback">{r.user_name?.[0]}</div>
+                  )}
+                  <div>
+                    <strong>{r.user_name}</strong>
+                    <div className="review-stars">{"★".repeat(r.rating)}{"☆".repeat(5-r.rating)}</div>
+                  </div>
+                  <span className="review-date">{new Date(r.created_at).toLocaleDateString()}</span>
+                </div>
+                <p>{r.comment}</p>
+              </div>
+            ))
+          )}
+        </div>
+
+        {user ? (
+          <div className="review-form">
+            <h3>Write a Review</h3>
+            {reviewError && <p className="error">{reviewError}</p>}
+            <div className="rating-select">
+              <span>Rating: </span>
+              {[1, 2, 3, 4, 5].map(num => (
+                <button
+                  key={num}
+                  type="button"
+                  className={newReview.rating >= num ? "star selected" : "star"}
+                  onClick={() => setNewReview({ ...newReview, rating: num })}
+                >★</button>
+              ))}
+            </div>
+            <textarea
+              placeholder="What did you think of our product?"
+              value={newReview.comment}
+              onChange={e => setNewReview({ ...newReview, comment: e.target.value })}
+            />
+            <button className="btn-primary" onClick={submitReview}>Submit Review</button>
+          </div>
+        ) : (
+          <div className="review-login-prompt">
+            <p>Please log in to write a review.</p>
+            <button className="btn-secondary" onClick={loginWithGoogle}>Sign In</button>
+          </div>
+        )}
       </div>
     </main>
   );

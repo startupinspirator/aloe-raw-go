@@ -15,5 +15,17 @@ func RequireAuth(c *gin.Context) {
 		return
 	}
 	c.Set("user_id", userID)
+	c.Set("user_role", session.Get("user_role")) // Added role
+	c.Next()
+}
+
+func RequireAdmin(c *gin.Context) {
+	session := sessions.Default(c)
+	role := session.Get("user_role")
+	if role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+		c.Abort()
+		return
+	}
 	c.Next()
 }

@@ -1,8 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import API_URL from "../config";
 import { IMG_WOMAN_APPLYING, IMG_SINGLE_BOX, IMG_STACKED_BOXES } from "../assets/images";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    axios.get(`${API_URL}/api/categories`)
+      .then(res => setCategories(res.data.categories || []))
+      .catch(err => console.error("Error fetching categories:", err));
+  }, []);
+
   return (
     <main className="home">
 
@@ -43,6 +54,23 @@ export default function Home() {
             .map((t, i) => <span key={i} className="marquee-item">{t} <span className="marquee-dot">✦</span></span>)}
         </div>
       </div>
+
+      {/* ── SHOP BY CATEGORY ── */}
+      {categories.length > 0 && (
+        <section className="categories-section">
+          <div className="section-label centered">Explore</div>
+          <h2 className="categories-title">Shop by <em>Category</em></h2>
+          <div className="categories-grid">
+            {categories.map(cat => (
+              <div key={cat.id} className="category-card" onClick={() => navigate("/product/1")}>
+                <h3>{cat.name}</h3>
+                <p>{cat.description}</p>
+                <div className="category-link">View Products →</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── STORY ── */}
       <section className="story-section" id="story">

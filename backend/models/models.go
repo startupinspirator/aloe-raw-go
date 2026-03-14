@@ -6,11 +6,20 @@ type User struct {
 	Name      string `json:"name"`
 	Email     string `json:"email"`
 	Avatar    string `json:"avatar"`
+	Role      string `json:"role"`
 	CreatedAt string `json:"created_at"`
+}
+
+type Category struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Description string `json:"description"`
 }
 
 type Product struct {
 	ID            int    `json:"id"`
+	CategoryID    int    `json:"category_id"`
 	Name          string `json:"name"`
 	Tagline       string `json:"tagline"`
 	Description   string `json:"description"`
@@ -18,6 +27,17 @@ type Product struct {
 	OriginalPrice int    `json:"original_price"`
 	Stock         int    `json:"stock"`
 	Active        int    `json:"active"`
+}
+
+type Review struct {
+	ID        int    `json:"id"`
+	UserID    int    `json:"user_id"`
+	ProductID int    `json:"product_id"`
+	Rating    int    `json:"rating"`
+	Comment   string `json:"comment"`
+	CreatedAt string `json:"created_at"`
+	UserName  string `json:"user_name"` // For display
+	UserAvatar string `json:"user_avatar"` // For display
 }
 
 type CartItem struct {

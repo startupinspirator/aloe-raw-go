@@ -67,20 +67,27 @@ func CreateOrder(c *gin.Context) {
 			orderID, item.productID, item.qty, item.price)
 	}
 
-	// Create Razorpay order
-	client := razorpay.NewClient(os.Getenv("RAZORPAY_KEY_ID"), os.Getenv("RAZORPAY_KEY_SECRET"))
-	data := map[string]interface{}{
-		"amount":   totalAmount * 100,
-		"currency": "INR",
-		"receipt":  fmt.Sprintf("order_%d", orderID),
-	}
-	rzpOrder, err := client.Order.Create(data, nil)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Razorpay error"})
-		return
+	var rzpOrderID string
+	
+	// MOCK BYPASS
+	if os.Getenv("RAZORPAY_KEY_ID") == "" || os.Getenv("RAZORPAY_KEY_ID") == "rzp_test_xxxxxxxxxxxx" {
+		rzpOrderID = fmt.Sprintf("mock_order_%d", orderID)
+	} else {
+		// Create Razorpay order
+		client := razorpay.NewClient(os.Getenv("RAZORPAY_KEY_ID"), os.Getenv("RAZORPAY_KEY_SECRET"))
+		data := map[string]interface{}{
+			"amount":   totalAmount * 100,
+			"currency": "INR",
+			"receipt":  fmt.Sprintf("order_%d", orderID),
+		}
+		rzpOrder, err := client.Order.Create(data, nil)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Razorpay error"})
+			return
+		}
+		rzpOrderID = fmt.Sprintf("%v", rzpOrder["id"])
 	}
 
-	rzpOrderID := fmt.Sprintf("%v", rzpOrder["id"])
 	database.DB.Exec("UPDATE orders SET razorpay_order_id=? WHERE id=?", rzpOrderID, orderID)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -104,16 +111,19 @@ func VerifyPayment(c *gin.Context) {
 		return
 	}
 
-	// Verify signature
-	secret := os.Getenv("RAZORPAY_KEY_SECRET")
-	message := body.RazorpayOrderID + "|" + body.RazorpayPaymentID
-	mac := hmac.New(sha256.New, []byte(secret))
-	mac.Write([]byte(message))
-	expected := hex.EncodeToString(mac.Sum(nil))
+	// MOCK BYPASS
+	if os.Getenv("RAZORPAY_KEY_ID") != "" && os.Getenv("RAZORPAY_KEY_ID") != "rzp_test_xxxxxxxxxxxx" {
+		// Verify signature
+		secret := os.Getenv("RAZORPAY_KEY_SECRET")
+		message := body.RazorpayOrderID + "|" + body.RazorpayPaymentID
+		mac := hmac.New(sha256.New, []byte(secret))
+		mac.Write([]byte(message))
+		expected := hex.EncodeToString(mac.Sum(nil))
 
-	if expected != body.RazorpaySignature {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Payment verification failed"})
-		return
+		if expected != body.RazorpaySignature {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Payment verification failed"})
+			return
+		}
 	}
 
 	database.DB.Exec("UPDATE orders SET status='paid', razorpay_payment_id=? WHERE id=?",

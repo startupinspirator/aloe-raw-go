@@ -9,11 +9,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "https://aloeraw-api.loca.lt",
+        target: "https://aloe-raw-api.onrender.com",
         changeOrigin: true,
       },
       "/auth": {
-        target: "https://aloeraw-api.loca.lt",
+        target: "https://aloe-raw-api.onrender.com",
         changeOrigin: true,
       },
     },

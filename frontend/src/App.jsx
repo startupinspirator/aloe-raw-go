@@ -9,6 +9,9 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 
+import AdminDashboard from "./pages/AdminDashboard";
+import Profile from "./pages/Profile";
+
 function LoginHandler() {
   const [params] = useSearchParams();
   useEffect(() => {
@@ -31,6 +34,8 @@ export default function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </CartProvider>
     </AuthProvider>

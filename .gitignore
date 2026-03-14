@@ -1,17 +1,22 @@
-# Go
-backend/aloe_raw.db
-backend/server
-backend/*.db
+# Binaries and executables
+backend/server.exe
+*.exe
 
-# Node
-frontend/node_modules/
+# Local environment and logs
+backend/.env
+frontend/out.txt
+*.log
+
+# Dependencies
+node_modules/
+backend/vendor/
+
+# Build outputs
 frontend/dist/
 
-# Env
-.env
-backend/.env
-frontend/.env
-
-# OS
+# Operating system files
 .DS_Store
 Thumbs.db
+
+# Database
+backend/aloe_raw.db

@@ -38,7 +38,10 @@ export default function Navbar() {
             }
             <div className="user-dropdown">
               <span className="user-name">{user.name}</span>
-              <Link to="/orders">My Orders</Link>
+              {user.role === 'admin' && (
+                <Link className="admin-link" to="/admin">Admin Dashboard</Link>
+              )}
+              <Link to="/profile">Profile & Orders</Link>
               <button onClick={handleLogout}>Sign Out</button>
             </div>
           </div>
