@@ -9,11 +9,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "https://aloeraw-api.loca.lt",
         changeOrigin: true,
       },
       "/auth": {
-        target: "http://localhost:8080",
+        target: "https://aloeraw-api.loca.lt",
         changeOrigin: true,
       },
     },
