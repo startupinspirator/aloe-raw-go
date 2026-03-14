@@ -1,6 +1,7 @@
 services:
   - type: web
     name: aloe-raw-api
+    plan: free
     runtime: go
     buildCommand: go build -o server .
     startCommand: ./server
