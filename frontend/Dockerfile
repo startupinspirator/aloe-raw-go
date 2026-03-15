@@ -8,8 +8,6 @@ RUN npm install
 
 COPY . .
 
-# Pass build args if needed (though Railway handles env vars)
-# RUN npm run build
 RUN npm run build
 
 # Run stage
@@ -17,7 +15,7 @@ FROM nginx:stable-alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Custom nginx config to handle SPA routing if needed
+# Custom nginx config template
 RUN echo 'server { \
     listen 80; \
     location / { \
@@ -27,6 +25,10 @@ RUN echo 'server { \
     } \
 }' > /etc/nginx/conf.d/default.conf
 
+# Limit worker processes to 2 to avoid excessive process creation on Railway
+RUN sed -i 's/worker_processes  auto;/worker_processes  2;/g' /etc/nginx/nginx.conf
+
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# Replace listen port with $PORT provided by Railway at runtime
+CMD ["/bin/sh", "-c", "sed -i \"s/listen 80;/listen ${PORT:-80};/g\" /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
