@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"path/filepath"
 	_ "modernc.org/sqlite"
 )
 
@@ -14,6 +15,14 @@ func Init() {
 	if dbPath == "" {
 		dbPath = "./aloe_raw.db"
 	}
+
+	// Ensure directory exists if DB_PATH is in a subdirectory (e.g., /app/data/aloe_raw.db)
+	if dir := filepath.Dir(dbPath); dir != "." {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			log.Printf("Warning: Failed to create DB directory %s: %v", dir, err)
+		}
+	}
+
 	var err error
 	DB, err = sql.Open("sqlite", dbPath)
 	if err != nil { log.Fatal("Failed to open database:", err) }
