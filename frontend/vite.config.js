@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   // base must match your GitHub repo name
-  base: "/aloe-raw/",
+  base: "/",
   server: {
     port: 5173,
     proxy: {
