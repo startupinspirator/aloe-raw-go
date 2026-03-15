@@ -15,7 +15,8 @@ FROM nginx:stable-alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Custom nginx config template
+# Custom nginx config to handle SPA routing
+# We use the built-in variable substitution for Nginx on Alpine
 RUN echo 'server { \
     listen 80; \
     location / { \
@@ -25,10 +26,11 @@ RUN echo 'server { \
     } \
 }' > /etc/nginx/conf.d/default.conf
 
-# Limit worker processes to 2 to avoid excessive process creation on Railway
+# Limit worker processes to 2
 RUN sed -i 's/worker_processes  auto;/worker_processes  2;/g' /etc/nginx/nginx.conf
 
 EXPOSE 80
 
-# Replace listen port with $PORT provided by Railway at runtime
-CMD ["/bin/sh", "-c", "sed -i \"s/listen 80;/listen ${PORT:-80};/g\" /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+# Railway will map the public port to 80 if we set it in the UI.
+# If they provide a $PORT variable, we should listen on it.
+CMD ["/bin/sh", "-c", "sed -i \"s/listen 80;/listen ${PORT:-80};/g\" /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]

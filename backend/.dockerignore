@@ -1,0 +1,5 @@
+vendor
+*.db
+.env
+.git
+server.exe
