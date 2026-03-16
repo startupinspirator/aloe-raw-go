@@ -31,13 +31,15 @@ func SetupRouter() *gin.Engine {
 
 	// ── CORS ───────────────────────────────────────────────
 	clientURL := os.Getenv("CLIENT_URL")
-	if clientURL == "" {
-		clientURL = "http://localhost:5173"
+	allowedOrigins := []string{"http://localhost:5173", "https://aloe-raw-go.pages.dev"}
+	if clientURL != "" {
+		allowedOrigins = append(allowedOrigins, clientURL)
 	}
+
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{clientURL},
+		AllowOrigins:     allowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"},
 		AllowCredentials: true,
 	}))
 
