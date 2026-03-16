@@ -3,7 +3,7 @@
 const isDev = import.meta.env.DEV;
 
 export const API_URL = isDev
-  ? ""   // Vite proxy handles it
-  : import.meta.env.VITE_API_URL || "";
+  ? "" // Vite proxy handles it
+  : import.meta.env.VITE_API_URL;
 
 export default API_URL;
