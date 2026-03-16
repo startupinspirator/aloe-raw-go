@@ -16,7 +16,7 @@ function LoginHandler() {
   const [params] = useSearchParams();
   useEffect(() => {
     if (params.get("login") === "success") {
-      window.history.replaceState({}, "", "/aloe-raw/");
+      window.history.replaceState({}, "", "/");
     }
   }, [params]);
   return null;
