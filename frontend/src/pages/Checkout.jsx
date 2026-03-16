@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import API_URL from "../config";
+import { loadScript } from "../utils/loadScript";
 
 export default function Checkout() {
   const { cart, cartTotal, clearCart } = useCart();
@@ -14,6 +16,11 @@ export default function Checkout() {
   const [form, setForm] = useState({
     name: user?.name || "", phone: "", address: "", city: "", pincode: "",
   });
+
+  useEffect(() => {
+    loadScript("https://checkout.razorpay.com/v1/checkout.js")
+      .catch(err => console.error("Razorpay SDK load failed:", err));
+  }, []);
 
   if (!user) {
     return (
