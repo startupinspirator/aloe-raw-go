@@ -89,15 +89,5 @@ func SetupRouter() *gin.Engine {
 		}
 	}
 
-	// ── Static Files & SPA Fallback ────────────────────────
-	// Serve static assets
-	r.Static("/assets", "./frontend/dist/assets")
-	r.StaticFile("/favicon.ico", "./frontend/dist/favicon.ico")
-
-	// SPA Fallback: All other routes serve index.html
-	r.NoRoute(func(c *gin.Context) {
-		c.File("./frontend/dist/index.html")
-	})
-
 	return r
 }

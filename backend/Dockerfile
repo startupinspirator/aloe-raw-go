@@ -2,16 +2,9 @@
 FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
-
-# Install build dependencies for CGO/SQLite (if needed, though modernc.org/sqlite shouldn't need it)
-RUN apk add --no-cache gcc musl-dev
-
-COPY go.mod go.sum ./
+COPY backend/go.mod backend/go.sum ./
 RUN go mod download
-
-COPY . .
-
-# Build the application
+COPY backend/ ./
 RUN go build -o server .
 
 # Run stage
