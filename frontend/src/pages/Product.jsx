@@ -26,8 +26,17 @@ export default function Product() {
 
   useEffect(() => {
     axios.get(`${API_URL}/api/products/${id}`)
-      .then(res => setProduct(res.data))
-      .catch(() => setError("Product not found"));
+      .then(res => {
+        // Ensure we got a valid JSON object and not an HTML fallback
+        if (typeof res.data !== "object" || res.data === null) {
+          throw new Error("Invalid response format");
+        }
+        setProduct(res.data);
+      })
+      .catch((err) => {
+        console.error("Fetch product failed:", err);
+        setError("Product not found or Connection Error");
+      });
       
     fetchReviews();
   }, [id]);

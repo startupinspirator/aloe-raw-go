@@ -6,4 +6,8 @@ export const API_URL = isDev
   ? "" // Vite proxy handles it
   : import.meta.env.VITE_API_URL;
 
+if (!isDev && !API_URL) {
+  console.error("CRITICAL: VITE_API_URL is missing. API calls will fail. Check your environment variables.");
+}
+
 export default API_URL;
